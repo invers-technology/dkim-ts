@@ -9,6 +9,15 @@ enum HeaderParseState {
   Complete,
 }
 
+export const getHeaders = (
+  headers: EmailHeader[],
+  key: string,
+): string | undefined => {
+  return headers.find(
+    (header) => header.key.toLowerCase() === key.toLowerCase(),
+  )?.value;
+};
+
 export const parseHeaders = (rawData: string): [EmailHeader[], number] => {
   let headers: EmailHeader[] = [];
   let ix = 0;
@@ -25,7 +34,6 @@ export const parseHeaders = (rawData: string): [EmailHeader[], number] => {
       }
     }
     let [header, ix_next] = parseHeader(rawData.slice(ix, rawData.length));
-    console.log(header, ix_next);
     headers.push(header);
     ix += ix_next;
   }
@@ -100,10 +108,15 @@ const parseHeader = (rawData: string): [EmailHeader, number] => {
   }
 
   return [
-    {
-      key: rawData.slice(0, ix_key_end),
-      value: rawData.slice(ix_value_start, ix_value_end),
-    },
+    ix_key_end !== 0
+      ? {
+          key: rawData.slice(0, ix_key_end),
+          value: rawData.slice(ix_value_start, ix_value_end),
+        }
+      : {
+          key: rawData.slice(0, ix),
+          value: rawData.slice(ix, ix),
+        },
     ix,
   ];
 };
