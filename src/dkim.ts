@@ -34,10 +34,11 @@ export const parseDkim = (headers: EmailHeader[]): DkimHeader => {
     h: "",
     s: "",
   };
-  for (const dkimParam of dkimParams) {
-    let [key, value] = dkimParam.split("=");
-    key = key.trim();
-    value = value.trim();
+  for (let dkimParam of dkimParams) {
+    dkimParam = dkimParam.trim();
+    let [key, value] = dkimParam.startsWith("bh")
+      ? [dkimParam.slice(0, 2), dkimParam.slice(3, dkimParam.length)]
+      : [dkimParam.slice(0, 1), dkimParam.slice(2, dkimParam.length)];
     dkim[key as keyof DkimHeader] = value;
   }
   return dkim;

@@ -54,28 +54,11 @@ export const simpleHeader = (header: string): string => {
 
 // https://tools.ietf.org/html/rfc6376#section-3.4.4
 export const relaxedBody = (body: string): string => {
-  body = body.replace("\t", " ");
-  let previous = false;
-  body = body
-    .split("")
-    .filter((c) => {
-      if (c === " ") {
-        if (previous) {
-          return false;
-        } else {
-          previous = true;
-          return true;
-        }
-      } else {
-        previous = false;
-        return true;
-      }
-    })
-    .join("");
+  body = body.replace(/\t/g, " ");
 
-  while (body.includes(" \r\n")) {
-    body = body.replace(" \r\n", "\r\n");
-  }
+  body = body.replace(/ +/g, " ");
+
+  body = body.replace(/ +\r\n/g, "\r\n");
 
   while (body.endsWith("\r\n\r\n")) {
     body = body.slice(0, -2);
@@ -84,8 +67,6 @@ export const relaxedBody = (body: string): string => {
   if (body.length > 0 && !body.endsWith("\r\n")) {
     body += "\r\n";
   }
-
-  body = body.replace(/\\/g, "");
 
   return body;
 };
