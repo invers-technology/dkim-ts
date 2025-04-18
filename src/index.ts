@@ -1,7 +1,5 @@
 import { parseEmail } from "./email";
 import { imap } from "./imap";
-import { hashBody } from "./email";
-import { getHeaders } from "./parser";
 
 export * from "./rsa";
 export { imap };
@@ -30,11 +28,10 @@ imap.once("ready", () => {
       });
 
       msg.on("end", async () => {
-        const { headers, body } = parseEmail(emailRaw);
-        const dkimSignature = getHeaders(headers, "dkim-signature");
-        const bodyHash = hashBody(body);
-        console.log(bodyHash, "bodyHash");
-        console.log(dkimSignature, "dkimSignature");
+        const { headers, dkim, body } = parseEmail(emailRaw);
+        console.log(headers, "headers");
+        console.log(dkim, "dkim");
+        console.log(body, "body");
       });
     });
 

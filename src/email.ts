@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { parseHeaders } from "./parser";
+import { parseDkim, DkimHeader } from "./dkim";
 
 export interface EmailHeader {
   key: string;
@@ -8,16 +9,15 @@ export interface EmailHeader {
 
 export const parseEmail = (
   rawData: string,
-): { headers: EmailHeader[]; body: string } => {
+): { headers: EmailHeader[]; body: string; dkim: DkimHeader } => {
   const [headers, ix] = parseHeaders(rawData);
+  const dkim = parseDkim(headers);
   const body = rawData.slice(ix, rawData.length);
-  return { headers, body };
+  return { headers, dkim, body };
 };
 
-export const hashBody = (body: string | undefined) => {
-  let encodedBody = (body || "").replace(/\r\n/g, "");
-  encodedBody = `${encodedBody}`;
+export const hashBody = (body: string) => {
   const hash = crypto.createHash("sha256");
-  hash.update(encodedBody);
+  hash.update(body);
   return hash.digest("base64");
 };
