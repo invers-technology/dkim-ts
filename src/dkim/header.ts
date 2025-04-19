@@ -1,4 +1,3 @@
-import dns from "dns/promises";
 import { EmailHeader } from "../email";
 
 export interface DkimHeader {
@@ -22,7 +21,6 @@ export const parseDkim = (headers: EmailHeader[]): DkimHeader => {
   const dkimHeader = headers.find(
     (header) => header.key.toLowerCase() === "dkim-signature",
   );
-  console.log(dkimHeader, "dkimHeader");
   if (!dkimHeader) {
     throw new Error("DKIM header not found");
   }
@@ -62,17 +60,4 @@ export const getEmptySignatureDkim = (headers: EmailHeader[]): string => {
     emptySignatureDkim += `${key}=${value}; `;
   }
   return emptySignatureDkim;
-};
-
-export const getDkimPublicKey = async (dkim: DkimHeader): Promise<string> => {
-  const { d: domain, s: selector } = dkim;
-  const dnsDomain = `${selector}._domainkey.${domain}`;
-  const dnsTxt = await dns.resolveTxt(dnsDomain);
-  const publicKeyData = dnsTxt[0][0].split("p=")[1];
-  const publicKey =
-    "-----BEGIN PUBLIC KEY-----\n" +
-    publicKeyData +
-    "\n" +
-    "-----END PUBLIC KEY-----\n";
-  return publicKey;
 };
