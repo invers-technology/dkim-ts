@@ -1,11 +1,11 @@
 import { relaxedHeaders } from "./dkim/canonicalization";
 import { parseEmail } from "./email";
 import { hashHeaders } from "./dkim/hash";
-import { getEmptySignatureDkim } from "./dkim/header";
+import { getEmptySignatureDkim, parseDkim } from "./dkim/header";
 import { imap } from "./imap";
 import { verifyDkimSignature } from "./dkim/verification";
 
-export { imap };
+export { parseEmail };
 
 imap.once("ready", () => {
   imap.openBox("INBOX", false, (err, box) => {
@@ -31,12 +31,15 @@ imap.once("ready", () => {
       });
 
       msg.on("end", async () => {
-        const { headers, dkim, body } = parseEmail(emailRaw);
+        console.log("emailRaw\n", emailRaw);
+        const { headers, dkim } = parseEmail(emailRaw);
         const relaxedH = relaxedHeaders(dkim, headers);
         const rawDkim = getEmptySignatureDkim(headers);
         const hashH = hashHeaders(relaxedH, rawDkim);
         const verified = await verifyDkimSignature(dkim, hashH);
-        console.log(verified, "verified");
+        console.log("relaxedH\n", relaxedH);
+        console.log("rawDkim\n", rawDkim);
+        console.log("verified\n", verified);
       });
     });
 

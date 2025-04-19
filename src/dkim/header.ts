@@ -35,7 +35,7 @@ export const parseDkim = (headers: EmailHeader[]): DkimHeader => {
     s: "",
   };
   for (let dkimParam of dkimParams) {
-    dkimParam = dkimParam.trim();
+    dkimParam = dkimParam.trim().replace(/\r\n/g, "").replace(/\s/g, "");
     const key = dkimParam.split("=")[0];
     const value = dkimParam.slice(key.length + 1, dkimParam.length);
     dkim[key as keyof DkimHeader] = value;
@@ -51,13 +51,14 @@ export const getEmptySignatureDkim = (headers: EmailHeader[]): string => {
     throw new Error("DKIM header not found");
   }
   const dkimParams = dkimHeader.value.split(";");
-  let emptySignatureDkim = "dkim_header: ";
+  let emptySignatureDkim = "dkim-signature:";
   for (let dkimParam of dkimParams) {
-    dkimParam = dkimParam.trim();
+    dkimParam = dkimParam.replace(/\r\n/g, "").replace(/\s/g, "");
     const key = dkimParam.split("=")[0];
     const value =
       key === "b" ? "" : dkimParam.slice(key.length + 1, dkimParam.length);
     emptySignatureDkim += `${key}=${value}; `;
   }
+  emptySignatureDkim = emptySignatureDkim.slice(0, -2);
   return emptySignatureDkim;
 };
