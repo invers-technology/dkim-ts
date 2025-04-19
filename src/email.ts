@@ -1,6 +1,5 @@
-import crypto from "crypto";
 import { parseHeaders } from "./parser";
-import { parseDkim, DkimHeader } from "./dkim";
+import { parseDkim, DkimHeader } from "./dkim/header";
 
 export interface EmailHeader {
   key: string;
@@ -14,10 +13,4 @@ export const parseEmail = (
   const dkim = parseDkim(headers);
   const body = rawData.slice(ix, rawData.length);
   return { headers, dkim, body };
-};
-
-export const hashBody = (body: string) => {
-  const hash = crypto.createHash("sha256");
-  hash.update(body);
-  return hash.digest("base64");
 };

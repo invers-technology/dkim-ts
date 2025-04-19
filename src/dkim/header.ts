@@ -1,4 +1,4 @@
-import { EmailHeader } from "./email";
+import { EmailHeader } from "../email";
 
 export interface DkimHeader {
   v: string;
@@ -42,4 +42,25 @@ export const parseDkim = (headers: EmailHeader[]): DkimHeader => {
     dkim[key as keyof DkimHeader] = value;
   }
   return dkim;
+};
+
+export const getEmptySignatureDkim = (headers: EmailHeader[]): string => {
+  const dkimHeader = headers.find(
+    (header) => header.key.toLowerCase() === "dkim-signature",
+  );
+  if (!dkimHeader) {
+    throw new Error("DKIM header not found");
+  }
+  const dkimParams = dkimHeader.value.split(";");
+  let emptySignatureDkim = "dkim_header: ";
+  for (let dkimParam of dkimParams) {
+    dkimParam = dkimParam.trim();
+    let [key, value] = dkimParam.startsWith("bh")
+      ? [dkimParam.slice(0, 2), dkimParam.slice(3, dkimParam.length)]
+      : dkimParam.startsWith("b")
+        ? [dkimParam.slice(0, 1), ""]
+        : [dkimParam.slice(0, 1), dkimParam.slice(2, dkimParam.length)];
+    emptySignatureDkim += `${key}=${value}; `;
+  }
+  return emptySignatureDkim;
 };

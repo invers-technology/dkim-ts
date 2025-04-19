@@ -1,5 +1,7 @@
-import { relaxedBody } from "./dkim/canonicalization";
-import { hashBody, parseEmail } from "./email";
+import { relaxedBody, relaxedHeaders } from "./dkim/canonicalization";
+import { parseEmail } from "./email";
+import { hashBody, hashHeaders } from "./dkim/hash";
+import { getEmptySignatureDkim } from "./dkim/header";
 import { imap } from "./imap";
 
 export * from "./rsa";
@@ -14,7 +16,7 @@ imap.once("ready", () => {
       throw new Error("No new emails");
     }
 
-    const fetch = imap.seq.fetch(`${1}:*`, {
+    const fetch = imap.seq.fetch(`${box.messages.total}:*`, {
       bodies: [""],
       markSeen: true,
     });
@@ -30,12 +32,16 @@ imap.once("ready", () => {
 
       msg.on("end", async () => {
         const { headers, dkim, body } = parseEmail(emailRaw);
-        const relaxed = relaxedBody(body);
-        const hash = hashBody(relaxed);
-        const { bh } = dkim;
-
-        console.log(hash, "hash");
-        console.log(bh, "bh");
+        const relaxedB = relaxedBody(body);
+        const hash = hashBody(relaxedB);
+        const { bh, h } = dkim;
+        const relaxedH = relaxedHeaders(dkim, headers);
+        const rawDkim = getEmptySignatureDkim(headers);
+        const hashH = hashHeaders(relaxedH, rawDkim);
+        console.log(hashH, "hashHeaders");
+        // console.log(h, "h");
+        // console.log(hash, "hash");
+        // console.log(bh, "bh");
       });
     });
 
@@ -45,6 +51,7 @@ imap.once("ready", () => {
 
     fetch.on("end", () => {
       console.log("Done fetching new email.");
+      imap.end();
     });
   });
 });

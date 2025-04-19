@@ -1,3 +1,7 @@
+import { EmailHeader } from "../email";
+import { DkimHeader } from "./header";
+import { selectSigningHeaders } from "./signingHeader";
+
 enum Canonicalization {
   Simple = "simple",
   Relaxed = "relaxed",
@@ -44,8 +48,55 @@ export const canonicalize = (
   ];
 };
 
-export const relaxedHeader = (header: string): string => {
-  return header.replace(/\s+/g, " ").trim();
+export const relaxedHeaders = (
+  dkim: DkimHeader,
+  headers: EmailHeader[],
+): string => {
+  const { h } = dkim;
+  const signingHeaders = selectSigningHeaders(h, headers);
+  let header = "";
+  for (const { key, value } of signingHeaders) {
+    header += key.toLowerCase();
+    header += ":";
+    header += relaxedHeader(value);
+    header += "\r\n";
+  }
+
+  return header;
+};
+
+const relaxedHeader = (header: string): string => {
+  header = header.replace(/\t/g, " ");
+
+  header = header.replace(/\r\n/g, "");
+
+  while (header.endsWith(" ")) {
+    header = header.slice(0, -1);
+  }
+
+  while (header.startsWith(" ")) {
+    header = header.slice(1);
+  }
+
+  let previous = false;
+  header = header
+    .split("")
+    .filter((c) => {
+      if (c === " ") {
+        if (previous) {
+          return false;
+        } else {
+          previous = true;
+          return true;
+        }
+      } else {
+        previous = false;
+        return true;
+      }
+    })
+    .join("");
+
+  return header;
 };
 
 export const simpleHeader = (header: string): string => {
