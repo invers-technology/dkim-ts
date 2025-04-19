@@ -1,7 +1,7 @@
 import { relaxedBody, relaxedHeaders } from "./dkim/canonicalization";
 import { parseEmail } from "./email";
 import { hashBody, hashHeaders } from "./dkim/hash";
-import { getEmptySignatureDkim } from "./dkim/header";
+import { getEmptySignatureDkim, getDkimPublicKey } from "./dkim/header";
 import { imap } from "./imap";
 
 export * from "./rsa";
@@ -38,10 +38,13 @@ imap.once("ready", () => {
         const relaxedH = relaxedHeaders(dkim, headers);
         const rawDkim = getEmptySignatureDkim(headers);
         const hashH = hashHeaders(relaxedH, rawDkim);
+        const publicKey = await getDkimPublicKey(dkim);
+        console.log(rawDkim, "rawDkim");
         console.log(hashH, "hashHeaders");
-        // console.log(h, "h");
-        // console.log(hash, "hash");
-        // console.log(bh, "bh");
+        console.log(h, "h");
+        console.log(hash, "hash");
+        console.log(bh, "bh");
+        console.log(publicKey, "publicKey");
       });
     });
 

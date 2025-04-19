@@ -1,3 +1,4 @@
+import dns from "dns/promises";
 import { EmailHeader } from "../email";
 
 export interface DkimHeader {
@@ -21,6 +22,7 @@ export const parseDkim = (headers: EmailHeader[]): DkimHeader => {
   const dkimHeader = headers.find(
     (header) => header.key.toLowerCase() === "dkim-signature",
   );
+  console.log(dkimHeader, "dkimHeader");
   if (!dkimHeader) {
     throw new Error("DKIM header not found");
   }
@@ -36,9 +38,8 @@ export const parseDkim = (headers: EmailHeader[]): DkimHeader => {
   };
   for (let dkimParam of dkimParams) {
     dkimParam = dkimParam.trim();
-    let [key, value] = dkimParam.startsWith("bh")
-      ? [dkimParam.slice(0, 2), dkimParam.slice(3, dkimParam.length)]
-      : [dkimParam.slice(0, 1), dkimParam.slice(2, dkimParam.length)];
+    const key = dkimParam.split("=")[0];
+    const value = dkimParam.slice(key.length + 1, dkimParam.length);
     dkim[key as keyof DkimHeader] = value;
   }
   return dkim;
@@ -55,12 +56,23 @@ export const getEmptySignatureDkim = (headers: EmailHeader[]): string => {
   let emptySignatureDkim = "dkim_header: ";
   for (let dkimParam of dkimParams) {
     dkimParam = dkimParam.trim();
-    let [key, value] = dkimParam.startsWith("bh")
-      ? [dkimParam.slice(0, 2), dkimParam.slice(3, dkimParam.length)]
-      : dkimParam.startsWith("b")
-        ? [dkimParam.slice(0, 1), ""]
-        : [dkimParam.slice(0, 1), dkimParam.slice(2, dkimParam.length)];
+    const key = dkimParam.split("=")[0];
+    const value =
+      key === "b" ? "" : dkimParam.slice(key.length + 1, dkimParam.length);
     emptySignatureDkim += `${key}=${value}; `;
   }
   return emptySignatureDkim;
+};
+
+export const getDkimPublicKey = async (dkim: DkimHeader): Promise<string> => {
+  const { d: domain, s: selector } = dkim;
+  const dnsDomain = `${selector}._domainkey.${domain}`;
+  const dnsTxt = await dns.resolveTxt(dnsDomain);
+  const publicKeyData = dnsTxt[0][0].split("p=")[1];
+  const publicKey =
+    "-----BEGIN PUBLIC KEY-----\n" +
+    publicKeyData +
+    "\n" +
+    "-----END PUBLIC KEY-----\n";
+  return publicKey;
 };
