@@ -15,17 +15,30 @@ export interface EmailHeader {
   value: string;
 }
 
-export const parseEmailToCanonicalized = (
-  rawData: string,
-): {
+export interface Email {
+  headers: EmailHeader[];
+  dkim: DkimParams;
+  body: string;
+}
+
+export interface CanonicalizedEmail {
   canonicalizedHeaders: string;
   canonicalizedBody: string;
   dkim: DkimParams;
-} => {
+}
+
+export const parseEmail = (rawData: string): Email => {
   const emailFormatData = rawData.replace(/\r\n|\n/g, "\r\n");
   const [headers, ix] = parseHeaders(emailFormatData);
   const dkim = parseDkim(headers);
   const body = emailFormatData.slice(ix, emailFormatData.length);
+  return { headers, dkim, body };
+};
+
+export const parseEmailToCanonicalized = (
+  rawData: string,
+): CanonicalizedEmail => {
+  const { dkim, headers, body } = parseEmail(rawData);
   const canonicalizeInstruction = newCanonicalization(dkim.c);
   const [canonicalizedHeaders, canonicalizedBody] = canonicalize(
     canonicalizeInstruction,
