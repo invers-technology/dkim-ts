@@ -24,7 +24,7 @@ import {
   getDkimPublicKey,
 } from "dkim-verifier";
 
-const emailRaw = readFileSync(emailFilePath, "utf8");
+const emailRaw = fs.readFileSync("tests/example.eml", "utf8");
 const { canonicalizedHeaders, canonicalizedBody, dkim } =
   parseRawEmail(emailRaw);
 const isBodyVerified = verifyBody(canonicalizedBody, dkim);
@@ -34,6 +34,7 @@ const isDkimVerified = verifyDkimSignature(
   canonicalizedHeaders,
   publicKey,
 );
+
 expect(isBodyVerified).toBe(true);
 expect(isDkimVerified).toBe(true);
 ```

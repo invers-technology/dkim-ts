@@ -22,9 +22,10 @@ export const parseRawEmail = (
   canonicalizedBody: string;
   dkim: DkimParams;
 } => {
-  const [headers, ix] = parseHeaders(rawData);
+  const emailFormatData = rawData.replace(/\r\n|\n/g, "\r\n");
+  const [headers, ix] = parseHeaders(emailFormatData);
   const dkim = parseDkim(headers);
-  const body = rawData.slice(ix, rawData.length);
+  const body = emailFormatData.slice(ix, emailFormatData.length);
   const canonicalizeInstruction = newCanonicalization(dkim.c);
   const [canonicalizedHeaders, canonicalizedBody] = canonicalize(
     canonicalizeInstruction,
