@@ -20,11 +20,11 @@ const getDkimPublicKey = async (dkim: DkimHeader): Promise<string> => {
 
 export const verifyDkimSignature = async (
   dkim: DkimHeader,
-  hash: string,
+  headers: string,
 ): Promise<boolean> => {
   const publicKey = await getDkimPublicKey(dkim);
   const { a: algorithm, b: signature } = dkim;
   const verifier = crypto.createVerify(algorithm);
-  verifier.update(hash);
+  verifier.update(headers);
   return verifier.verify(publicKey, signature, "base64");
 };

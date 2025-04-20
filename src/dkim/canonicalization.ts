@@ -66,7 +66,7 @@ export const relaxedHeaders = (
   return header;
 };
 
-const relaxedHeader = (header: string): string => {
+export const relaxedHeader = (header: string): string => {
   header = header.replace(/\t/g, " ");
 
   header = relaxedNewLineAndSpace(header);
@@ -90,7 +90,9 @@ export const simpleHeader = (header: string): string => {
 export const relaxedBody = (body: string): string => {
   body = body.replace(/\t/g, " ");
 
-  body = relaxedNewLineAndSpace(body);
+  body = body.replace(/ +/g, " ");
+
+  body = body.replace(/ +\r\n/g, "\r\n");
 
   while (body.endsWith("\r\n\r\n")) {
     body = body.slice(0, -2);

@@ -1,6 +1,6 @@
 import { relaxedBody, relaxedHeaders } from "./dkim/canonicalization";
 import { parseEmail } from "./email";
-import { hashHeaders, hashBody } from "./dkim/hash";
+import { hashBody } from "./dkim/hash";
 import { getEmptySignatureDkim, parseDkim } from "./dkim/header";
 import { imap } from "./imap";
 import { verifyDkimSignature } from "./dkim/verification";
@@ -33,18 +33,17 @@ imap.once("ready", () => {
       msg.on("end", async () => {
         const { headers, body, dkim } = parseEmail(emailRaw);
         const relaxedH = relaxedHeaders(dkim, headers);
-        const rawDkim = getEmptySignatureDkim(headers);
-        const hashH = hashHeaders(relaxedH, rawDkim);
-        const verified = await verifyDkimSignature(dkim, hashH);
+        const verified = await verifyDkimSignature(dkim, relaxedH);
         const { bh } = dkim;
         const relaxedB = relaxedBody(body);
         const bodyHash = hashBody(relaxedB);
-        console.log("relaxedHeaders\n", relaxedH);
-        console.log("relaxedHeaders\n", Buffer.from(relaxedH));
-        // console.log("relaxedBody", relaxedB);
-        // console.log("hashHeaders", hashH);
-        // console.log("bodyHash", bodyHash);
-        // console.log("verified", bh === bodyHash);
+
+        if (bh !== bodyHash) {
+          throw new Error("Body hash mismatch");
+        }
+        if (!verified) {
+          throw new Error("Not verified");
+        }
       });
     });
 
