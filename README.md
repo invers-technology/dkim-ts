@@ -18,7 +18,7 @@ $ npm i dkim-verifier
 ```ts
 import { readFileSync } from "fs";
 import {
-  parseRawEmail,
+  parseEmailToCanonicalized,
   verifyBody,
   verifyDkimSignature,
   getDkimPublicKey,
@@ -26,7 +26,7 @@ import {
 
 const emailRaw = fs.readFileSync("tests/example.eml", "utf8");
 const { canonicalizedHeaders, canonicalizedBody, dkim } =
-  parseRawEmail(emailRaw);
+  parseEmailToCanonicalized(emailRaw);
 const isBodyVerified = verifyBody(canonicalizedBody, dkim);
 const publicKey = await getDkimPublicKey(dkim);
 const isDkimVerified = verifyDkimSignature(

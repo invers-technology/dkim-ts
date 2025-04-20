@@ -15,7 +15,7 @@ export interface EmailHeader {
   value: string;
 }
 
-export const parseRawEmail = (
+export const parseEmailToCanonicalized = (
   rawData: string,
 ): {
   canonicalizedHeaders: string;

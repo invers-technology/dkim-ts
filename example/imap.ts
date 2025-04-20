@@ -1,7 +1,7 @@
 import Imap from "imap";
 import { config } from "dotenv";
 import {
-  parseRawEmail,
+  parseEmailToCanonicalized,
   verifyBody,
   verifyDkimSignature,
   getDkimPublicKey,
@@ -44,8 +44,9 @@ imap.once("ready", () => {
       });
 
       msg.on("end", async () => {
+        console.log(emailRaw);
         const { canonicalizedHeaders, canonicalizedBody, dkim } =
-          parseRawEmail(emailRaw);
+          parseEmailToCanonicalized(emailRaw);
         const isBodyVerified = verifyBody(canonicalizedBody, dkim);
         const publicKey = await getDkimPublicKey(dkim);
         const isDkimVerified = verifyDkimSignature(
