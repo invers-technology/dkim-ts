@@ -1,6 +1,6 @@
 {
   "name": "dkim-verifier",
-  "version": "0.0.2",
+  "version": "0.0.6",
   "author": {
     "name": "Ash Whitehat",
     "url": "https://github.com/ashwhitehat"
@@ -20,13 +20,15 @@
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
-    "*.{js,d.ts,.map}"
+    "*.js",
+    "*.d.ts",
+    "*.map"
   ],
   "private": false,
   "scripts": {
     "lint": "eslint src",
     "fmt": "prettier --write .",
-    "fmt:check": "prettier --check .",
+    "fmt:check": "prettier --check src tests",
     "build": "tsc",
     "prepare": "rm -rf dist && yarn build && cp -r dist/* . && rm -rf dist",
     "test": "jest"
