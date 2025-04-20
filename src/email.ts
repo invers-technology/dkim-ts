@@ -1,5 +1,5 @@
 import { parseHeaders } from "./parser";
-import { parseDkim, DkimHeader } from "./dkim/header";
+import { parseDkim, DkimParams } from "./dkim/header";
 
 export interface EmailHeader {
   key: string;
@@ -8,7 +8,7 @@ export interface EmailHeader {
 
 export const parseEmail = (
   rawData: string,
-): { headers: EmailHeader[]; body: string; dkim: DkimHeader } => {
+): { headers: EmailHeader[]; body: string; dkim: DkimParams } => {
   const [headers, ix] = parseHeaders(rawData);
   const dkim = parseDkim(headers);
   const body = rawData.slice(ix, rawData.length);

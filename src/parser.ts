@@ -9,15 +9,6 @@ enum HeaderParseState {
   Complete,
 }
 
-export const getHeaders = (
-  headers: EmailHeader[],
-  key: string,
-): string | undefined => {
-  return headers.find(
-    (header) => header.key.toLowerCase() === key.toLowerCase(),
-  )?.value;
-};
-
 export const parseHeaders = (rawData: string): [EmailHeader[], number] => {
   let headers: EmailHeader[] = [];
   let ix = 0;

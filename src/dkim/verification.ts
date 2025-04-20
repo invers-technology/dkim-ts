@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import dns from "dns/promises";
-import { DkimHeader } from "./header";
+import { DkimParams } from "./header";
 
-const getDkimPublicKey = async (dkim: DkimHeader): Promise<string> => {
+const getDkimPublicKey = async (dkim: DkimParams): Promise<string> => {
   const { d: domain, s: selector } = dkim;
   const dnsDomain = `${selector}._domainkey.${domain}`;
   const dnsTxt = await dns.resolveTxt(dnsDomain);
@@ -19,12 +19,12 @@ const getDkimPublicKey = async (dkim: DkimHeader): Promise<string> => {
 };
 
 export const verifyDkimSignature = async (
-  dkim: DkimHeader,
+  dkim: DkimParams,
   headers: string,
 ): Promise<boolean> => {
   const publicKey = await getDkimPublicKey(dkim);
   const { a: algorithm, b: signature } = dkim;
-  const verifier = crypto.createVerify(algorithm);
+  const verifier = crypto.createVerify(algorithm.toUpperCase());
   verifier.update(headers);
   return verifier.verify(publicKey, signature, "base64");
 };

@@ -1,6 +1,7 @@
 import { EmailHeader } from "../email";
 import { relaxedHeader } from "./canonicalization";
-export interface DkimHeader {
+
+export interface DkimParams {
   v: string;
   a: string;
   b: string;
@@ -17,9 +18,9 @@ export interface DkimHeader {
   z?: string;
 }
 
-export const parseDkim = (headers: EmailHeader[]): DkimHeader => {
+export const parseDkim = (headers: EmailHeader[]): DkimParams => {
   const dkimParams = dkimKeyAndValue(headers);
-  const dkim: DkimHeader = {
+  const dkim: DkimParams = {
     v: "",
     a: "",
     b: "",
@@ -29,7 +30,7 @@ export const parseDkim = (headers: EmailHeader[]): DkimHeader => {
     s: "",
   };
   for (let [key, value] of dkimParams) {
-    dkim[key as keyof DkimHeader] = value;
+    dkim[key as keyof DkimParams] = value;
   }
   return dkim;
 };
@@ -45,13 +46,13 @@ export const getEmptySignatureDkim = (headers: EmailHeader[]): string => {
 };
 
 const dkimKeyAndValue = (headers: EmailHeader[]): [string, string][] => {
-  const dkimHeader = headers.find(
+  const DkimParams = headers.find(
     (header) => header.key.toLowerCase() === "dkim-signature",
   );
-  if (!dkimHeader) {
+  if (!DkimParams) {
     throw new Error("DKIM header not found");
   }
-  const dkimParams = dkimHeader.value.split(";");
+  const dkimParams = DkimParams.value.split(";");
   const dkimKeyAndValue: [string, string][] = [];
   for (let dkimParam of dkimParams) {
     dkimParam = relaxedHeader(dkimParam);

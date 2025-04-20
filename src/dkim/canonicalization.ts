@@ -1,5 +1,5 @@
 import { EmailHeader } from "../email";
-import { DkimHeader, getEmptySignatureDkim } from "./header";
+import { DkimParams, getEmptySignatureDkim } from "./header";
 import { selectSigningHeaders } from "./signingHeader";
 
 enum Canonicalization {
@@ -49,7 +49,7 @@ export const canonicalize = (
 };
 
 export const relaxedHeaders = (
-  dkim: DkimHeader,
+  dkim: DkimParams,
   headers: EmailHeader[],
 ): string => {
   const { h } = dkim;

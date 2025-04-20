@@ -1,5 +1,5 @@
 import { canonicalize, newCanonicalization } from "./canonicalization";
-import { DkimHeader } from "./header";
+import { DkimParams } from "./header";
 
 export const newDkim = ({
   domain,
@@ -9,8 +9,8 @@ export const newDkim = ({
   domain: string;
   selector: string;
   canonicalization?: string;
-}): DkimHeader => {
-  const dkim: DkimHeader = {
+}): DkimParams => {
+  const dkim: DkimParams = {
     v: "1",
     a: "rsa-sha256",
     b: "",
@@ -24,7 +24,7 @@ export const newDkim = ({
 };
 
 export const signDkim = (
-  dkim: DkimHeader,
+  dkim: DkimParams,
   header: string,
   body: string,
 ): string => {
