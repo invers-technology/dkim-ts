@@ -1,28 +1,47 @@
 {
   "name": "dkim-verifier",
-  "version": "1.0.0",
-  "description": "DKIM Signature Verifier in TypeScript",
-  "main": "index.js",
-  "scripts": {
-    "fmt": "prettier --write .",
-    "test": "jest",
-    "build": "tsc"
+  "version": "0.0.1",
+  "author": {
+    "name": "Ash Whitehat",
+    "url": "https://github.com/ashwhitehat"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "DKIM Signature Verifier in TypeScript",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:inverse-technology/dkim-ts.git"
+  },
+  "homepage": "https://github.com/inverse-technology/dkim-ts",
+  "keywords": [
+    "dkim",
+    "dkim-signature",
+    "typescript"
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "scripts": {
+    "lint": "eslint src",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
+    "build": "tsc",
+    "prepare": "rm -rf dist && yarn build",
+    "test": "jest"
+  },
   "devDependencies": {
     "@types/imap": "^0.8.42",
     "@types/jest": "^29.5.14",
     "@types/mailparser": "^3.4.5",
     "@types/node": "^22.14.1",
+    "dotenv": "^16.5.0",
+    "eslint": "^9.25.0",
+    "imap": "^0.8.19",
     "jest": "^29.7.0",
     "prettier": "^3.5.3",
     "ts-jest": "^29.3.2",
     "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "dotenv": "^16.5.0",
-    "imap": "^0.8.19"
   }
 }
