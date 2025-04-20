@@ -1,5 +1,5 @@
 import { EmailHeader } from "../email";
-
+import { relaxedNewLineAndSpace } from "./canonicalization";
 export interface DkimHeader {
   v: string;
   a: string;
@@ -35,7 +35,7 @@ export const parseDkim = (headers: EmailHeader[]): DkimHeader => {
     s: "",
   };
   for (let dkimParam of dkimParams) {
-    dkimParam = dkimParam.trim().replace(/\r\n/g, "").replace(/\s/g, "");
+    dkimParam = dkimParam.trim().replace(/\r\n/g, "");
     const key = dkimParam.split("=")[0];
     const value = dkimParam.slice(key.length + 1, dkimParam.length);
     dkim[key as keyof DkimHeader] = value;
@@ -53,12 +53,11 @@ export const getEmptySignatureDkim = (headers: EmailHeader[]): string => {
   const dkimParams = dkimHeader.value.split(";");
   let emptySignatureDkim = "dkim-signature:";
   for (let dkimParam of dkimParams) {
-    dkimParam = dkimParam.replace(/\r\n/g, "").replace(/\s/g, "");
+    dkimParam = relaxedNewLineAndSpace(dkimParam.trim());
     const key = dkimParam.split("=")[0];
     const value =
       key === "b" ? "" : dkimParam.slice(key.length + 1, dkimParam.length);
     emptySignatureDkim += `${key}=${value}; `;
   }
-  emptySignatureDkim = emptySignatureDkim.slice(0, -2);
-  return emptySignatureDkim;
+  return emptySignatureDkim.slice(0, -2);
 };

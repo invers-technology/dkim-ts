@@ -1,5 +1,5 @@
 import { EmailHeader } from "../email";
-import { DkimHeader } from "./header";
+import { DkimHeader, getEmptySignatureDkim } from "./header";
 import { selectSigningHeaders } from "./signingHeader";
 
 enum Canonicalization {
@@ -61,14 +61,15 @@ export const relaxedHeaders = (
     header += relaxedHeader(value);
     header += "\r\n";
   }
-
+  const emptySignatureDkim = getEmptySignatureDkim(headers);
+  header += emptySignatureDkim;
   return header;
 };
 
 const relaxedHeader = (header: string): string => {
   header = header.replace(/\t/g, " ");
 
-  header = header.replace(/\r\n/g, "");
+  header = relaxedNewLineAndSpace(header);
 
   while (header.endsWith(" ")) {
     header = header.slice(0, -1);
@@ -77,24 +78,6 @@ const relaxedHeader = (header: string): string => {
   while (header.startsWith(" ")) {
     header = header.slice(1);
   }
-
-  let previous = false;
-  header = header
-    .split("")
-    .filter((c) => {
-      if (c === " ") {
-        if (previous) {
-          return false;
-        } else {
-          previous = true;
-          return true;
-        }
-      } else {
-        previous = false;
-        return true;
-      }
-    })
-    .join("");
 
   return header;
 };
@@ -107,9 +90,7 @@ export const simpleHeader = (header: string): string => {
 export const relaxedBody = (body: string): string => {
   body = body.replace(/\t/g, " ");
 
-  body = body.replace(/ +/g, " ");
-
-  body = body.replace(/ +\r\n/g, "\r\n");
+  body = relaxedNewLineAndSpace(body);
 
   while (body.endsWith("\r\n\r\n")) {
     body = body.slice(0, -2);
@@ -124,4 +105,8 @@ export const relaxedBody = (body: string): string => {
 
 export const simpleBody = (body: string): string => {
   return body.replace(/\s+/g, " ").trim();
+};
+
+export const relaxedNewLineAndSpace = (str: string): string => {
+  return str.replace(/ +/g, " ").replace(/\r\n/g, "");
 };

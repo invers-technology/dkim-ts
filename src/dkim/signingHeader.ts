@@ -3,7 +3,13 @@ import { EmailHeader } from "../email";
 type SigningHeader = string[];
 
 const newSigningHeader = (header: string): SigningHeader => {
-  return header.split(":");
+  const uniqueHeaders: SigningHeader = [];
+  header.split(":").forEach((h) => {
+    if (!uniqueHeaders.includes(h)) {
+      uniqueHeaders.push(h);
+    }
+  });
+  return uniqueHeaders;
 };
 
 export const selectSigningHeaders = (
@@ -11,7 +17,13 @@ export const selectSigningHeaders = (
   headers: EmailHeader[],
 ): EmailHeader[] => {
   const signingHeaders = newSigningHeader(signingHeader);
-  return headers.filter((header) =>
-    signingHeaders.includes(header.key.toLowerCase()),
-  );
+  return signingHeaders
+    .map((h) => {
+      const header = headers.find(({ key }) => key.toLowerCase() === h);
+      if (header) {
+        return header;
+      }
+      return null;
+    })
+    .filter((header) => header !== null);
 };
