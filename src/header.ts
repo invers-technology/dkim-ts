@@ -29,7 +29,7 @@ export const parseDkim = (headers: EmailHeader[]): DkimParams => {
     h: "",
     s: "",
   };
-  for (let [key, value] of dkimParams) {
+  for (const [key, value] of dkimParams) {
     dkim[key as keyof DkimParams] = value;
   }
   return dkim;
@@ -38,9 +38,8 @@ export const parseDkim = (headers: EmailHeader[]): DkimParams => {
 export const getNonSignatureDkim = (headers: EmailHeader[]): string => {
   const dkimParams = dkimKeyAndValue(headers);
   let nonSignatureDkim = "dkim-signature:";
-  for (let [key, value] of dkimParams) {
-    if (key === "b") value = "";
-    nonSignatureDkim += `${key}=${value}; `;
+  for (const [key, value] of dkimParams) {
+    nonSignatureDkim += `${key}=${key === "b" ? "" : value}; `;
   }
   return nonSignatureDkim.slice(0, -2);
 };

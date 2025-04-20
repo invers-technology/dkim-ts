@@ -36,7 +36,7 @@ export const parseRawEmail = (
 };
 
 const parseHeaders = (rawData: string): [EmailHeader[], number] => {
-  let headers: EmailHeader[] = [];
+  const headers: EmailHeader[] = [];
   let i = 0;
   while (i < rawData.length) {
     if (rawData[i] === "\n") {
@@ -50,7 +50,7 @@ const parseHeaders = (rawData: string): [EmailHeader[], number] => {
         throw new Error("Invalid header");
       }
     }
-    let [header, i_next] = parseHeader(rawData.slice(i, rawData.length));
+    const [header, i_next] = parseHeader(rawData.slice(i, rawData.length));
     headers.push(header);
     i += i_next;
   }
