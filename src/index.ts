@@ -1,4 +1,6 @@
-import { parseEmail } from "./email";
-import { verifyDkimSignature } from "./dkim/verification";
-
-export { parseEmail, verifyDkimSignature };
+export { parseRawEmail } from "./parser";
+export {
+  verifyDkimSignature,
+  verifyBody,
+  getDkimPublicKey,
+} from "./verification";

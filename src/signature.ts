@@ -1,4 +1,4 @@
-import { EmailHeader } from "../email";
+import { EmailHeader } from "./parser";
 
 type SigningHeader = string[];
 

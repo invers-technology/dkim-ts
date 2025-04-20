@@ -1,4 +1,5 @@
-import { EmailHeader } from "./email";
+import { parseDkim, DkimParams } from "./header";
+import { newCanonicalization, canonicalize } from "./canonicalization";
 
 enum HeaderParseState {
   Initial,
@@ -9,26 +10,51 @@ enum HeaderParseState {
   Complete,
 }
 
-export const parseHeaders = (rawData: string): [EmailHeader[], number] => {
+export interface EmailHeader {
+  key: string;
+  value: string;
+}
+
+export const parseRawEmail = (
+  rawData: string,
+): {
+  canonicalizedHeaders: string;
+  canonicalizedBody: string;
+  dkim: DkimParams;
+} => {
+  const [headers, ix] = parseHeaders(rawData);
+  const dkim = parseDkim(headers);
+  const body = rawData.slice(ix, rawData.length);
+  const canonicalizeInstruction = newCanonicalization(dkim.c);
+  const [canonicalizedHeaders, canonicalizedBody] = canonicalize(
+    canonicalizeInstruction,
+    dkim,
+    headers,
+    body,
+  );
+  return { canonicalizedHeaders, canonicalizedBody, dkim };
+};
+
+const parseHeaders = (rawData: string): [EmailHeader[], number] => {
   let headers: EmailHeader[] = [];
-  let ix = 0;
-  while (ix < rawData.length) {
-    if (rawData[ix] === "\n") {
-      ix++;
+  let i = 0;
+  while (i < rawData.length) {
+    if (rawData[i] === "\n") {
+      i++;
       break;
-    } else if (rawData[ix] === "\r") {
-      if (ix + 1 < rawData.length && rawData[ix + 1] === "\n") {
-        ix += 2;
+    } else if (rawData[i] === "\r") {
+      if (i + 1 < rawData.length && rawData[i + 1] === "\n") {
+        i += 2;
         break;
       } else {
         throw new Error("Invalid header");
       }
     }
-    let [header, ix_next] = parseHeader(rawData.slice(ix, rawData.length));
+    let [header, i_next] = parseHeader(rawData.slice(i, rawData.length));
     headers.push(header);
-    ix += ix_next;
+    i += i_next;
   }
-  return [headers, ix];
+  return [headers, i];
 };
 
 const parseHeader = (rawData: string): [EmailHeader, number] => {

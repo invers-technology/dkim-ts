@@ -1,6 +1,6 @@
-import { EmailHeader } from "../email";
-import { DkimParams, getEmptySignatureDkim } from "./header";
-import { selectSigningHeaders } from "./signingHeader";
+import { EmailHeader } from "./parser";
+import { DkimParams, getNonSignatureDkim } from "./header";
+import { selectSigningHeaders } from "./signature";
 
 enum Canonicalization {
   Simple = "simple",
@@ -37,13 +37,14 @@ export const canonicalizationToStr = (c: DkimCanonicalization): string => {
 
 export const canonicalize = (
   c: DkimCanonicalization,
-  header: string,
+  dkim: DkimParams,
+  headers: EmailHeader[],
   body: string,
 ): [string, string] => {
   return [
     c[0] === Canonicalization.Simple
-      ? simpleHeader(header)
-      : relaxedHeader(header),
+      ? simpleHeaders(dkim, headers)
+      : relaxedHeaders(dkim, headers),
     c[1] === Canonicalization.Simple ? simpleBody(body) : relaxedBody(body),
   ];
 };
@@ -61,8 +62,8 @@ export const relaxedHeaders = (
     header += relaxedHeader(value);
     header += "\r\n";
   }
-  const emptySignatureDkim = getEmptySignatureDkim(headers);
-  header += emptySignatureDkim;
+  const nonSignatureDkim = getNonSignatureDkim(headers);
+  header += nonSignatureDkim;
   return header;
 };
 
@@ -82,8 +83,23 @@ export const relaxedHeader = (header: string): string => {
   return header;
 };
 
-export const simpleHeader = (header: string): string => {
-  return header.replace(/\s+/g, " ").trim();
+// https://tools.ietf.org/html/rfc6376#section-3.4.2
+export const simpleHeaders = (
+  dkim: DkimParams,
+  headers: EmailHeader[],
+): string => {
+  const { h } = dkim;
+  const signingHeaders = selectSigningHeaders(h, headers);
+  let header = "";
+  for (const { key, value } of signingHeaders) {
+    header += key;
+    header += ": ";
+    header += value;
+    header += "\r\n";
+  }
+  const nonSignatureDkim = getNonSignatureDkim(headers);
+  header += nonSignatureDkim;
+  return header;
 };
 
 // https://tools.ietf.org/html/rfc6376#section-3.4.4
@@ -106,6 +122,14 @@ export const relaxedBody = (body: string): string => {
 };
 
 export const simpleBody = (body: string): string => {
+  if (body.length === 0) {
+    return "\r\n";
+  }
+
+  while (body.endsWith("\r\n\r\n")) {
+    body = body.slice(0, -2);
+  }
+
   return body.replace(/\s+/g, " ").trim();
 };
 

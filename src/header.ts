@@ -1,4 +1,4 @@
-import { EmailHeader } from "../email";
+import { EmailHeader } from "./parser";
 import { relaxedHeader } from "./canonicalization";
 
 export interface DkimParams {
@@ -35,14 +35,14 @@ export const parseDkim = (headers: EmailHeader[]): DkimParams => {
   return dkim;
 };
 
-export const getEmptySignatureDkim = (headers: EmailHeader[]): string => {
+export const getNonSignatureDkim = (headers: EmailHeader[]): string => {
   const dkimParams = dkimKeyAndValue(headers);
-  let emptySignatureDkim = "dkim-signature:";
+  let nonSignatureDkim = "dkim-signature:";
   for (let [key, value] of dkimParams) {
     if (key === "b") value = "";
-    emptySignatureDkim += `${key}=${value}; `;
+    nonSignatureDkim += `${key}=${value}; `;
   }
-  return emptySignatureDkim.slice(0, -2);
+  return nonSignatureDkim.slice(0, -2);
 };
 
 const dkimKeyAndValue = (headers: EmailHeader[]): [string, string][] => {
