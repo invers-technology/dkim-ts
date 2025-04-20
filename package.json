@@ -1,6 +1,6 @@
 {
   "name": "dkim-verifier",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": {
     "name": "Ash Whitehat",
     "url": "https://github.com/ashwhitehat"

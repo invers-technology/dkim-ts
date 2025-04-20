@@ -1,4 +1,4 @@
-export { parseEmailToCanonicalized } from "./parser";
+export { parseEmail,parseEmailToCanonicalized } from "./parser";
 export {
   verifyDkimSignature,
   verifyBody,
