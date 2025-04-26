@@ -44,7 +44,6 @@ imap.once("ready", () => {
       });
 
       msg.on("end", async () => {
-        console.log(emailRaw);
         const { canonicalizedHeaders, canonicalizedBody, dkim } =
           parseEmailToCanonicalized(emailRaw);
         const isBodyVerified = verifyBody(canonicalizedBody, dkim);
