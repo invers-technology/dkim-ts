@@ -12,7 +12,7 @@ export const binaryToHex = (binary: string): string => {
 };
 
 export const hexToBinary = (hex: string): string => {
-  const rawHex = hex.replace("0x", "");
+  const rawHex = hex.replace(/^0x/, "");
   return rawHex
     .split("")
     .map((char) => parseInt(char, 16).toString(2).padStart(4, "0"))

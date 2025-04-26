@@ -14,11 +14,10 @@ const emptyCircuitInputN: CircuitInputN = Array.from(
 
 export const publicKeyNToCircomInputs = (n: string): CircuitInputN => {
   const binary = hexToBinary(n);
-  let subFields: CircuitInputN = emptyCircuitInputN;
+  const subFields: CircuitInputN = emptyCircuitInputN;
   for (let i = rsaFieldLength - 1; i >= 0; i--) {
     subFields[i] = subFieldFromBinary(binary.slice(i * 121, (i + 1) * 121));
   }
-  subFields;
   return subFields;
 };
 

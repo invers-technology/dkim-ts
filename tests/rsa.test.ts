@@ -1,15 +1,12 @@
 import {
   getDkimPublicKey,
   parseEmailToCanonicalized,
-  extractModulusN,
-  publicKeyNToCircomInputs,
+  verifyDkimSignature,
 } from "../src";
 import { binaryToHex, hexToBinary } from "../src/rsa/utils";
-import { emailRaw, randomHexString, circuitInputNToHex } from "./helper";
+import { randomHexString, emailRaw2 } from "./helper";
 
 describe("RSA", () => {
-  const { dkim } = parseEmailToCanonicalized(emailRaw);
-
   it("should convert hex to binary", async () => {
     const hex = randomHexString(128);
     const binary = hexToBinary(hex);
@@ -18,10 +15,14 @@ describe("RSA", () => {
   });
 
   it("should convert bigint to rsa field", async () => {
+    const { canonicalizedHeaders, dkim } = parseEmailToCanonicalized(emailRaw2);
     const publicKey = await getDkimPublicKey(dkim);
-    const modulusN = extractModulusN(publicKey);
-    const circuitInputN = publicKeyNToCircomInputs(modulusN);
-    const hex = circuitInputNToHex(circuitInputN);
-    expect(modulusN).toEqual(hex);
+    const isDkimVerified = verifyDkimSignature(
+      dkim,
+      canonicalizedHeaders,
+      publicKey,
+    );
+
+    expect(isDkimVerified).toEqual(true);
   });
 });

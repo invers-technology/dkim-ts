@@ -19,7 +19,9 @@ export const selectSigningHeaders = (
   const signingHeaders = newSigningHeader(signingHeader);
   return signingHeaders
     .map((h) => {
-      const header = headers.find(({ key }) => key.toLowerCase() === h);
+      const header = headers.find(
+        ({ key }) => key.toLowerCase() === h.toLowerCase(),
+      );
       if (header) {
         return header;
       }
