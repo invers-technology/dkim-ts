@@ -30,7 +30,7 @@
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check src tests",
     "build": "tsc",
-    "prepare": "rm -rf dist && yarn build && cp -r dist/* . && rm -rf dist",
+    "prepublishOnly": "rm -rf dist && yarn build && cp -r dist/* . && rm -rf dist",
     "test": "jest"
   },
   "devDependencies": {
@@ -46,5 +46,8 @@
     "ts-jest": "^29.3.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.30.1"
+  },
+  "dependencies": {
+    "@zk-email/circuits": "^6.3.3-nightly-20250214"
   }
 }
