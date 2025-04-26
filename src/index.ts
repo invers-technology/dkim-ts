@@ -1,7 +1,4 @@
 export { parseEmail, parseEmailToCanonicalized } from "./parser";
-export {
-  verifyDkimSignature,
-  verifyBody,
-  getDkimPublicKey,
-} from "./verification";
+export { verifyDkimSignature, verifyBody } from "./verification";
 export { getSignature } from "./header";
+export { getDkimPublicKey, extractModulusN } from "./rsa";
