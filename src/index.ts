@@ -4,3 +4,4 @@ export {
   verifyBody,
   getDkimPublicKey,
 } from "./verification";
+export { getSignature } from "./header";

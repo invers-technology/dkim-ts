@@ -35,6 +35,10 @@ export const parseDkim = (headers: EmailHeader[]): DkimParams => {
   return dkim;
 };
 
+export const getSignature = (dkim: DkimParams): string => {
+  return dkim.b;
+};
+
 export const getNonSignatureDkim = (headers: EmailHeader[]): string => {
   const dkimParams = dkimKeyAndValue(headers);
   let nonSignatureDkim = "dkim-signature:";

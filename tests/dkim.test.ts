@@ -1,12 +1,12 @@
-import fs from "fs";
-import { verifyBody } from "../src";
-import { getDkimPublicKey } from "../src";
-import { parseEmailToCanonicalized } from "../src";
-import { verifyDkimSignature } from "../src";
+import {
+  verifyBody,
+  getDkimPublicKey,
+  parseEmailToCanonicalized,
+  verifyDkimSignature,
+} from "../src";
+import { emailRaw } from "./helper";
 
-const emailRaw = fs.readFileSync("tests/example.eml", "utf8");
-
-describe("DKIM", () => {
+describe("Dkim", () => {
   it("should verify a dkim signature", async () => {
     const { canonicalizedHeaders, canonicalizedBody, dkim } =
       parseEmailToCanonicalized(emailRaw);
