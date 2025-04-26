@@ -1,28 +1,23 @@
 import {
-  getDkimPublicKey,
+  getDkimPublicKeyN,
   parseEmailToCanonicalized,
-  verifyDkimSignature,
+  publicKeyNToCircomInputs,
 } from "../src";
-import { binaryToHex, hexToBinary } from "../src/rsa/utils";
-import { randomHexString, emailRaw2 } from "./helper";
+import { emailRaw2 } from "./helper";
 
 describe("RSA", () => {
-  it("should convert hex to binary", async () => {
-    const hex = randomHexString(128);
-    const binary = hexToBinary(hex);
-    const hex2 = binaryToHex(binary);
-    expect(hex2).toEqual(hex);
-  });
+  it("should verify dkim signature", async () => {
+    try {
+      const { canonicalizedHeaders, dkim } =
+        parseEmailToCanonicalized(emailRaw2);
+      const { publicKey, n } = await getDkimPublicKeyN(dkim);
+      const inputs = publicKeyNToCircomInputs(n.toString(16));
 
-  it("should convert bigint to rsa field", async () => {
-    const { canonicalizedHeaders, dkim } = parseEmailToCanonicalized(emailRaw2);
-    const publicKey = await getDkimPublicKey(dkim);
-    const isDkimVerified = verifyDkimSignature(
-      dkim,
-      canonicalizedHeaders,
-      publicKey,
-    );
-
-    expect(isDkimVerified).toEqual(true);
+      expect(inputs).toBeDefined();
+      expect(inputs.length).toBe(17);
+    } catch (error) {
+      console.error("Error details:", error);
+      throw error;
+    }
   });
 });

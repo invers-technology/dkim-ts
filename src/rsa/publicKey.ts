@@ -1,5 +1,7 @@
 import dns from "dns/promises";
+import { createPublicKey } from "crypto";
 import { DkimParams } from "../header";
+import { jwkToBigInt } from "./utils";
 
 export const getDkimPublicKey = async (dkim: DkimParams): Promise<string> => {
   const { d: domain, s: selector } = dkim;
@@ -10,6 +12,19 @@ export const getDkimPublicKey = async (dkim: DkimParams): Promise<string> => {
     "\n" +
     "-----END PUBLIC KEY-----\n";
   return publicKey;
+};
+
+export const getDkimPublicKeyN = async (
+  dkim: DkimParams,
+): Promise<{ publicKey: string; n: bigint }> => {
+  const publicKey = await getDkimPublicKey(dkim);
+  return { publicKey, n: extractModulusN(publicKey) };
+};
+
+const extractModulusN = (publicKeyPem: string): bigint => {
+  const key = createPublicKey(publicKeyPem);
+  const jwk = key.export({ format: "jwk" });
+  return jwkToBigInt(jwk.n ?? "");
 };
 
 const getTxtRecord = async (

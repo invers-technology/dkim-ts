@@ -3,6 +3,6 @@ export { verifyDkimSignature, verifyBody } from "./verification";
 export { getSignature } from "./header";
 export {
   getDkimPublicKey,
-  extractModulusN,
+  getDkimPublicKeyN,
   publicKeyNToCircomInputs,
 } from "./rsa";
