@@ -1,6 +1,6 @@
 {
   "name": "dkim-verifier",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": {
     "name": "Ash Whitehat",
     "url": "https://github.com/ashwhitehat"
@@ -8,9 +8,9 @@
   "description": "DKIM Signature Verifier in TypeScript",
   "repository": {
     "type": "git",
-    "url": "git@github.com:inverse-technology/dkim-ts.git"
+    "url": "git@github.com:invers-technology/dkim-ts.git"
   },
-  "homepage": "https://github.com/inverse-technology/dkim-ts",
+  "homepage": "https://github.com/invers-technology/dkim-ts",
   "keywords": [
     "dkim",
     "dkim-signature",
@@ -36,7 +36,6 @@
   "devDependencies": {
     "@types/imap": "^0.8.42",
     "@types/jest": "^29.5.14",
-    "@types/mailparser": "^3.4.5",
     "@types/node": "^22.14.1",
     "dotenv": "^16.5.0",
     "eslint": "^9.25.0",
