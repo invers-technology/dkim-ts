@@ -35,8 +35,9 @@ export const parseDkim = (headers: EmailHeader[]): DkimParams => {
   return dkim;
 };
 
-export const getSignature = (dkim: DkimParams): string => {
-  return dkim.b;
+export const getSignature = (dkim: DkimParams): bigint => {
+  const bufferSignature = Buffer.from(dkim.b, "base64");
+  return BigInt(`0x${bufferSignature.toString("hex")}`);
 };
 
 export const getNonSignatureDkim = (headers: EmailHeader[]): string => {

@@ -1,7 +1,8 @@
 import {
   getDkimPublicKeyN,
   parseEmailToCanonicalized,
-  publicKeyNToCircomInputs,
+  bigintToCircomInputs,
+  getSignature,
 } from "../src";
 import { emailRaw2 } from "./helper";
 
@@ -9,9 +10,13 @@ describe("RSA", () => {
   it("should verify dkim signature", async () => {
     const { dkim } = parseEmailToCanonicalized(emailRaw2);
     const { n } = await getDkimPublicKeyN(dkim);
-    const inputs = publicKeyNToCircomInputs(n);
+    const signature = getSignature(dkim);
+    const publicKeyInputs = bigintToCircomInputs(n);
+    const signatureInputs = bigintToCircomInputs(signature);
 
-    expect(inputs).toBeDefined();
-    expect(inputs.length).toBe(17);
+    expect(publicKeyInputs).toBeDefined();
+    expect(publicKeyInputs.length).toBe(17);
+    expect(signatureInputs).toBeDefined();
+    expect(signatureInputs.length).toBe(17);
   });
 });

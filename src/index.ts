@@ -4,5 +4,5 @@ export { getSignature } from "./header";
 export {
   getDkimPublicKey,
   getDkimPublicKeyN,
-  publicKeyNToCircomInputs,
+  bigintToCircomInputs,
 } from "./rsa";
