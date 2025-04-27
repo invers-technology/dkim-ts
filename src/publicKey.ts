@@ -1,7 +1,6 @@
 import dns from "dns/promises";
 import { createPublicKey } from "crypto";
-import { DkimParams } from "../header";
-import { jwkToBigInt } from "./utils";
+import { DkimParams } from "./header";
 
 export const getDkimPublicKey = async (dkim: DkimParams): Promise<string> => {
   const { d: domain, s: selector } = dkim;
@@ -38,4 +37,14 @@ const getTxtRecord = async (
     publicKeyData += dnsTxt[0][i];
   }
   return publicKeyData;
+};
+
+const jwkToBigInt = (jwk: string): bigint => {
+  let base64 = jwk.replace(/-/g, "+").replace(/_/g, "/");
+  while (base64.length % 4) {
+    base64 += "=";
+  }
+  const base64Buffer = Buffer.from(base64, "base64");
+  const base64Hex = base64Buffer.toString("hex");
+  return BigInt(`0x${base64Hex}`);
 };
